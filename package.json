@@ -5,6 +5,7 @@
   "version": "13.0.6",
   "type": "module",
   "tshy": {
+    "selfLink": false,
     "exports": {
       "./package.json": "./package.json",
       "./raw": "./src/index.ts",
