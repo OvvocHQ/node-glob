@@ -63,7 +63,7 @@
     "presnap": "npm run prepare",
     "test": "tap",
     "snap": "tap",
-    "format": "prettier --write . --log-level warn",
+    "format": "prettier --write .",
     "typedoc": "typedoc",
     "profclean": "rm -f v8.log profile.txt",
     "test-regen": "npm run profclean && TEST_REGEN=1 node --no-warnings --loader ts-node/esm test/00-setup.ts",
