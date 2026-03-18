@@ -30,7 +30,7 @@ const cleanResults = (m: string[]) => {
       // de-windows
       return process.platform !== 'win32' ?
           f
-        : f.replace(/^[a-zA-Z]:[\/\\]+/, '/').replace(/[\\\/]+/g, '/')
+        : f.replace(/^[a-zA-Z]:[/\\]+/, '/').replace(/[\\/]+/g, '/')
     })
     .sort(alphasort)
 }
@@ -51,7 +51,7 @@ globs.forEach(function (pattern) {
     t.same(matches, expect, pattern)
   })
 
-  t.test(pattern + ' sync', async t => {
+  t.test(`${pattern} sync`, async t => {
     const matches = cleanResults(glob.globSync(pattern))
     t.same(matches, expect, 'should match shell (sync)')
   })

@@ -142,11 +142,11 @@ t.test('mark=false, / on pattern', async t => {
 
 const cwd = process
   .cwd()
-  .replace(/[\/\\]+$/, '')
+  .replace(/[/\\]+$/, '')
   .replace(/\\/g, '/')
 for (const mark of [true, false]) {
   for (const slash of [true, false]) {
-    t.test('cwd mark:' + mark + ' slash:' + slash, async t => {
+    t.test(`cwd mark:${mark} slash:${slash}`, async t => {
       const pattern = cwd + (slash ? '/' : '')
       const results = await glob(pattern, { mark })
       t.equal(results.length, 1)
@@ -154,7 +154,7 @@ for (const mark of [true, false]) {
       const syncResults = glob.globSync(pattern, { mark: mark })
       const syncRes = syncResults[0]?.replace(/\\/g, '/')
       if (mark) {
-        t.equal(res, cwd + '/')
+        t.equal(res, `${cwd}/`)
       } else {
         t.equal(res?.indexOf(cwd), 0)
       }
@@ -165,8 +165,8 @@ for (const mark of [true, false]) {
 
 for (const mark of [true, false]) {
   for (const slash of [true, false]) {
-    t.test('. mark:' + mark + ' slash:' + slash, async t => {
-      const pattern = '.' + (slash ? '/' : '')
+    t.test(`. mark:${mark} slash:${slash}`, async t => {
+      const pattern = `.${slash ? '/' : ''}`
       const results = await glob(pattern, { mark })
       t.equal(results.length, 1)
       const res = results[0]?.replace(/\\/g, '/')

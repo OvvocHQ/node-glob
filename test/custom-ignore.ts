@@ -1,8 +1,9 @@
 import { basename } from 'path'
-import { Path } from 'path-scurry'
+import type { Path } from 'path-scurry'
 import t from 'tap'
 import { fileURLToPath } from 'url'
-import { glob, globSync, IgnoreLike } from '../dist/esm/index.js'
+import type { IgnoreLike } from '../dist/esm/index.js'
+import { glob, globSync } from '../dist/esm/index.js'
 
 const cwd = fileURLToPath(new URL('./fixtures', import.meta.url))
 

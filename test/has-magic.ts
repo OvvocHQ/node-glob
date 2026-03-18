@@ -15,7 +15,7 @@ t.test('non-string pattern is evil magic', async t => {
 })
 
 t.test('detect magic in glob patterns', async t => {
-  t.notOk(glob.hasMagic(''), "no magic in ''")
+  t.notOk(glob.hasMagic(['']), "no magic in ''")
   t.notOk(glob.hasMagic('a/b/c/'), 'no magic a/b/c/')
   t.ok(glob.hasMagic('a/b/**/'), 'magic in a/b/**/')
   t.ok(glob.hasMagic('a/b/?/'), 'magic in a/b/?/')

@@ -1,6 +1,6 @@
 import { escape, unescape } from 'minimatch'
-import { Minipass } from 'minipass'
-import { Path } from 'path-scurry'
+import type { Minipass } from 'minipass'
+import type { Path } from 'path-scurry'
 import type {
   GlobOptions,
   GlobOptionsWithFileTypesFalse,

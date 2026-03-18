@@ -10,7 +10,7 @@ const pattern = '../{*.md,test}/'
 const expect = ['.']
 const cwd = __dirname
 const opt: GlobOptions = { cwd }
-process.chdir(__dirname + '/..')
+process.chdir(`${__dirname}/..`)
 
 t.test('slashes only match directories', async t => {
   t.same(glob.globSync(pattern, opt), expect, 'sync test')

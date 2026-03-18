@@ -95,8 +95,8 @@ export class Pattern {
           prest.shift()
           grest.shift()
         }
-        const p = (p1 as string) + '/'
-        const g = g1 + '/'
+        const p = `${p1 as string}/`
+        const g = `${g1}/`
         this.#patternList = [p, ...prest]
         this.#globList = [g, ...grest]
         this.length = this.#patternList.length
@@ -105,7 +105,7 @@ export class Pattern {
   }
 
   [customInspect]() {
-    return 'Pattern <' + this.#globList.slice(this.#index).join('/') + '>'
+    return `Pattern <${this.#globList.slice(this.#index).join('/')}>`
   }
 
   /**

@@ -44,7 +44,7 @@ const cases: Case[] = [
   ['b/**', 'b/c/d', j(['b', 'b/c']), 'a'],
   ['b/**', 'd', j(['b', 'b/c', 'b/c/d']), 'a'],
   ['b/**', 'b/c/**', ['b'], 'a'],
-  ['b/**', (process.cwd() + '/a/b/c/**').split(sep).join('/'), ['b'], 'a'],
+  ['b/**', `${process.cwd()}/a/b/c/**`.split(sep).join('/'), ['b'], 'a'],
   ['**/d', 'b/c/d', j(['c/d']), 'a'],
   [
     'a/**/[gh]',
@@ -334,7 +334,7 @@ const cases: Case[] = [
   ['a/*/.y/b', 'a/x/**', j(['a/z/.y/b'])],
   [
     'a/*/.y/b',
-    (process.cwd() + '/a/x/**').split(sep).join('/'),
+    `${process.cwd()}/a/x/**`.split(sep).join('/'),
     j(['a/z/.y/b']),
   ],
   [

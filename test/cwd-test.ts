@@ -19,24 +19,24 @@ t.test('changing cwd and searching for **/d', t => {
     t.test(cwd || '(empty string)', async t => {
       t.same(new Set(await glob('**/d', { cwd })), matches)
       if (cwd) {
-        t.same(new Set(await glob('**/d', { cwd: cwd + '/' })), matches)
-        t.same(new Set(await glob('**/d', { cwd: cwd + '/.' })), matches)
-        t.same(new Set(await glob('**/d', { cwd: cwd + '/./' })), matches)
+        t.same(new Set(await glob('**/d', { cwd: `${cwd}/` })), matches)
+        t.same(new Set(await glob('**/d', { cwd: `${cwd}/.` })), matches)
+        t.same(new Set(await glob('**/d', { cwd: `${cwd}/./` })), matches)
       } else {
         t.same(new Set(await glob('**/d', { cwd: '.' })), matches)
         t.same(new Set(await glob('**/d', { cwd: './' })), matches)
       }
       t.same(new Set(await glob('**/d', { cwd: resolve(cwd) })), matches)
       t.same(
-        new Set(await glob('**/d', { cwd: resolve(cwd) + '/' })),
+        new Set(await glob('**/d', { cwd: `${resolve(cwd)}/` })),
         matches,
       )
       t.same(
-        new Set(await glob('**/d', { cwd: resolve(cwd) + '/.' })),
+        new Set(await glob('**/d', { cwd: `${resolve(cwd)}/.` })),
         matches,
       )
       t.same(
-        new Set(await glob('**/d', { cwd: resolve(cwd) + '/./' })),
+        new Set(await glob('**/d', { cwd: `${resolve(cwd)}/./` })),
         matches,
       )
     })

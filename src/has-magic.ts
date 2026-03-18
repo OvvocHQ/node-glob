@@ -1,5 +1,5 @@
 import { Minimatch } from 'minimatch'
-import { GlobOptions } from './glob.js'
+import type { GlobOptions } from './glob.js'
 
 /**
  * Return true if the patterns provided contain any magic glob characters,
@@ -16,10 +16,7 @@ export const hasMagic = (
   pattern: string | string[],
   options: GlobOptions = {},
 ): boolean => {
-  if (!Array.isArray(pattern)) {
-    pattern = [pattern]
-  }
-  for (const p of pattern) {
+  for (const p of Array.isArray(pattern) ? pattern : [pattern]) {
     if (new Minimatch(p, options).hasMagic()) return true
   }
   return false

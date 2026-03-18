@@ -1,9 +1,6 @@
 import t from 'tap'
-import {
-  glob,
-  GlobOptionsWithFileTypesUnset,
-  globSync,
-} from '../src/index.js'
+import type { GlobOptionsWithFileTypesUnset } from '../src/index.js'
+import { glob, globSync } from '../src/index.js'
 
 t.test('no include child matches', async t => {
   const cwd = t.testdir({ a: { b: { c: { d: { e: { f: '' } } } } } })

@@ -10,7 +10,7 @@ process.chdir(fileURLToPath(new URL('./fixtures', import.meta.url)))
 
 const marks = [true, false]
 for (const mark of marks) {
-  t.test('mark=' + mark, t => {
+  t.test(`'mark=${mark}`, t => {
     t.plan(3)
 
     t.test('Emits relative matches prefixed with ./', async t => {
@@ -23,7 +23,7 @@ for (const mark of marks) {
         'must match all files',
       )
       for (const m of results) {
-        t.ok(m.startsWith('.' + sep))
+        t.ok(m.startsWith(`.${sep}`))
       }
     })
 
@@ -37,7 +37,7 @@ for (const mark of marks) {
         'must match all files',
       )
       for (const m of results) {
-        t.ok(m.startsWith('.' + sep))
+        t.ok(m.startsWith(`.${sep}`))
       }
     })
 
@@ -53,7 +53,7 @@ for (const mark of marks) {
           'must match all files',
         )
         for (const m of results) {
-          t.ok((mark && m === '.' + sep) || !m.startsWith('.' + sep))
+          t.ok((mark && m === `.${sep}`) || !m.startsWith(`.${sep}`))
         }
       },
     )
@@ -67,13 +67,13 @@ t.test('does not add ./ for patterns starting in ../', async t => {
   t.test('async', async t => {
     const g = new Glob(pattern, { dotRelative: true, cwd })
     for await (const m of g) {
-      t.ok(!m.startsWith('.' + sep + '..' + sep))
+      t.ok(!m.startsWith(`.${sep}..${sep}`))
     }
   })
   t.test('sync', async t => {
     const g = new Glob(pattern, { dotRelative: true, cwd })
     for (const m of g) {
-      t.ok(!m.startsWith('.' + sep + '..' + sep))
+      t.ok(!m.startsWith(`.${sep}..${sep}`))
     }
   })
 })

@@ -1,7 +1,7 @@
 import { relative } from 'path'
 import t from 'tap'
 import { glob } from '../dist/esm/index.js'
-import { GlobOptionsWithFileTypesUnset } from '../dist/esm/glob.js'
+import type { GlobOptionsWithFileTypesUnset } from '../dist/esm/glob.js'
 
 if (process.platform === 'win32') {
   t.plan(0, 'skip on windows')
@@ -45,7 +45,7 @@ t.test('async test', t => {
       t.plan(opts.length)
       for (const opt of opts) {
         const res = await glob(pattern, opt)
-        const msg = pattern + ' ' + JSON.stringify(opt)
+        const msg = `${pattern} ${JSON.stringify(opt)}`
         t.not(res.indexOf(link), -1, msg)
       }
     })
@@ -59,7 +59,7 @@ t.test('sync test', t => {
       t.plan(opts.length)
       for (const opt of opts) {
         const res = glob.globSync(pattern, opt)
-        t.not(res.indexOf(link), -1, 'opt=' + JSON.stringify(opt))
+        t.not(res.indexOf(link), -1, `opt=${JSON.stringify(opt)}`)
       }
     })
   }

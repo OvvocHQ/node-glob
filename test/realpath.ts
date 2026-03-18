@@ -3,7 +3,7 @@ import * as fsp from 'fs/promises'
 import { resolve } from 'path'
 import t from 'tap'
 import { glob } from '../dist/esm/index.js'
-import { GlobOptionsWithFileTypesUnset } from '../dist/esm/glob.js'
+import type { GlobOptionsWithFileTypesUnset } from '../dist/esm/glob.js'
 import { fileURLToPath } from 'url'
 
 const alphasort = (a: string, b: string) => a.localeCompare(b, 'en')
@@ -55,7 +55,7 @@ if (process.platform === 'win32') {
 
   for (const [opt, expect, p = pattern] of cases) {
     expect.sort(alphasort)
-    t.test(p + ' ' + JSON.stringify(opt), async t => {
+    t.test(`${p} ${JSON.stringify(opt)}`, async t => {
       opt.realpath = true
       t.same(glob.globSync(p, opt).sort(alphasort), expect, 'sync')
       const a = await glob(p, opt)
@@ -66,7 +66,9 @@ if (process.platform === 'win32') {
   t.test('realpath failure', async t => {
     // failing realpath means that it does not include the result
     process.chdir(origCwd)
-    const { glob } = (await t.mockImport('../dist/esm/index.js', {
+    const { glob } = await t.mockImport<
+      typeof import('../dist/esm/index.js')
+    >('../dist/esm/index.js', {
       fs: {
         ...fs,
         realpathSync: Object.assign(fs.realpathSync, {
@@ -81,7 +83,7 @@ if (process.platform === 'win32') {
           throw new Error('no error for you async')
         },
       },
-    })) as typeof import('../dist/esm/index.js')
+    })
     const pattern = 'a/symlink/a/b/c/a/b/**'
     t.test('setting cwd explicitly', async t => {
       const opt = { realpath: true, cwd: fixtureDir }

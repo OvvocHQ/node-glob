@@ -3,10 +3,11 @@
 // Ignoring a path ignores its children if the pattern ends in /**
 // Ignores are always parsed in dot:true mode
 
-import { Minimatch, MinimatchOptions } from 'minimatch'
-import { Path } from 'path-scurry'
+import type { MinimatchOptions } from 'minimatch'
+import { Minimatch } from 'minimatch'
+import type { Path } from 'path-scurry'
 import { Pattern } from './pattern.js'
-import { GlobWalkerOpts } from './walker.js'
+import type { GlobWalkerOpts } from './walker.js'
 
 export interface IgnoreLike {
   ignored?: (p: Path) => boolean
@@ -119,8 +120,8 @@ export class Ignore implements IgnoreLike {
   }
 
   childrenIgnored(p: Path): boolean {
-    const fullpath = p.fullpath() + '/'
-    const relative = (p.relative() || '.') + '/'
+    const fullpath = `${p.fullpath()}/`
+    const relative = `${p.relative() || '.'}/`
     for (const m of this.relativeChildren) {
       if (m.match(relative)) return true
     }

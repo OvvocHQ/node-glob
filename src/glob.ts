@@ -1,15 +1,15 @@
-import { Minimatch, MinimatchOptions } from 'minimatch'
-import { Minipass } from 'minipass'
+import type { MinimatchOptions } from 'minimatch'
+import { Minimatch } from 'minimatch'
+import type { Minipass } from 'minipass'
 import { fileURLToPath } from 'node:url'
+import type { FSOption, Path } from 'path-scurry'
 import {
-  FSOption,
-  Path,
   PathScurry,
   PathScurryDarwin,
   PathScurryPosix,
   PathScurryWin32,
 } from 'path-scurry'
-import { IgnoreLike } from './ignore.js'
+import type { IgnoreLike } from './ignore.js'
 import { Pattern } from './pattern.js'
 import { GlobStream, GlobWalker } from './walker.js'
 
@@ -467,9 +467,7 @@ export class Glob<Opts extends GlobOptions> implements GlobOptions {
       throw new Error('cannot set absolute and withFileTypes:true')
     }
 
-    if (typeof pattern === 'string') {
-      pattern = [pattern]
-    }
+    let p: string[] = typeof pattern === 'string' ? [pattern] : pattern
 
     this.windowsPathsNoEscape =
       !!opts.windowsPathsNoEscape ||
@@ -477,17 +475,17 @@ export class Glob<Opts extends GlobOptions> implements GlobOptions {
         false
 
     if (this.windowsPathsNoEscape) {
-      pattern = pattern.map(p => p.replace(/\\/g, '/'))
+      p = p.map(p => p.replace(/\\/g, '/'))
     }
 
     if (this.matchBase) {
       if (opts.noglobstar) {
         throw new TypeError('base matching requires globstar')
       }
-      pattern = pattern.map(p => (p.includes('/') ? p : `./**/${p}`))
+      p = p.map(p => (p.includes('/') ? p : `./**/${p}`))
     }
 
-    this.pattern = pattern
+    this.pattern = p
 
     this.platform = opts.platform || defaultPlatform
     this.opts = { ...opts, platform: this.platform }

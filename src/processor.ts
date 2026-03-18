@@ -1,9 +1,10 @@
 // synchronous utility for filtering entries and calculating subwalks
 
-import { GLOBSTAR, MMRegExp } from 'minimatch'
-import { Path } from 'path-scurry'
-import { MMPattern, Pattern } from './pattern.js'
-import { GlobWalkerOpts } from './walker.js'
+import type { MMRegExp } from 'minimatch'
+import { GLOBSTAR } from 'minimatch'
+import type { Path } from 'path-scurry'
+import type { MMPattern, Pattern } from './pattern.js'
+import type { GlobWalkerOpts } from './walker.js'
 
 /**
  * A cache of which patterns have been processed for a given Path

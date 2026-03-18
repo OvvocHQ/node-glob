@@ -5,15 +5,16 @@
  * @module
  */
 import { Minipass } from 'minipass'
-import { Path } from 'path-scurry'
-import { Ignore, IgnoreLike } from './ignore.js'
+import type { Path } from 'path-scurry'
+import type { IgnoreLike } from './ignore.js'
+import { Ignore } from './ignore.js'
 
 // XXX can we somehow make it so that it NEVER processes a given path more than
 // once, enough that the match set tracking is no longer needed?  that'd speed
 // things up a lot.  Or maybe bring back nounique, and skip it in that case?
 
 // a single minimatch set entry with 1 or more parts
-import { Pattern } from './pattern.js'
+import type { Pattern } from './pattern.js'
 import { Processor } from './processor.js'
 
 export interface GlobWalkerOpts {
@@ -90,7 +91,7 @@ export abstract class GlobUtil<O extends GlobWalkerOpts = GlobWalkerOpts> {
   seen: Set<Path> = new Set<Path>()
   paused: boolean = false
   aborted: boolean = false
-  #onResume: (() => any)[] = []
+  #onResume: (() => unknown)[] = []
   #ignore?: IgnoreLike
   #sep: '\\' | '/'
   signal?: AbortSignal
@@ -143,12 +144,12 @@ export abstract class GlobUtil<O extends GlobWalkerOpts = GlobWalkerOpts> {
     if (this.signal?.aborted) return
     /* c8 ignore stop */
     this.paused = false
-    let fn: (() => any) | undefined = undefined
+    let fn: (() => unknown) | undefined = undefined
     while (!this.paused && (fn = this.#onResume.shift())) {
       fn()
     }
   }
-  onResume(fn: () => any) {
+  onResume(fn: () => unknown) {
     if (this.signal?.aborted) return
     /* c8 ignore start */
     if (!this.paused) {
@@ -161,13 +162,19 @@ export abstract class GlobUtil<O extends GlobWalkerOpts = GlobWalkerOpts> {
 
   // do the requisite realpath/stat checking, and return the path
   // to add or undefined to filter it out.
-  async matchCheck(e: Path, ifDir: boolean): Promise<Path | undefined> {
+  async matchCheck(
+    inPath: Path,
+    ifDir: boolean,
+  ): Promise<Path | undefined> {
     if (ifDir && this.opts.nodir) return undefined
     let rpc: Path | undefined
+    let e: Path
     if (this.opts.realpath) {
-      rpc = e.realpathCached() || (await e.realpath())
+      rpc = inPath.realpathCached() || (await inPath.realpath())
       if (!rpc) return undefined
       e = rpc
+    } else {
+      e = inPath
     }
     const needStat = e.isUnknown() || this.opts.stat
     const s = needStat ? await e.lstat() : e
@@ -198,13 +205,16 @@ export abstract class GlobUtil<O extends GlobWalkerOpts = GlobWalkerOpts> {
       : undefined
   }
 
-  matchCheckSync(e: Path, ifDir: boolean): Path | undefined {
+  matchCheckSync(inPath: Path, ifDir: boolean): Path | undefined {
     if (ifDir && this.opts.nodir) return undefined
     let rpc: Path | undefined
+    let e: Path
     if (this.opts.realpath) {
-      rpc = e.realpathCached() || e.realpathSync()
+      rpc = inPath.realpathCached() || inPath.realpathSync()
       if (!rpc) return undefined
       e = rpc
+    } else {
+      e = inPath
     }
     const needStat = e.isUnknown() || this.opts.stat
     const s = needStat ? e.lstatSync() : e
@@ -240,10 +250,10 @@ export abstract class GlobUtil<O extends GlobWalkerOpts = GlobWalkerOpts> {
     } else {
       const rel = this.opts.posix ? e.relativePosix() : e.relative()
       const pre =
-        this.opts.dotRelative && !rel.startsWith('..' + this.#sep) ?
-          '.' + this.#sep
+        this.opts.dotRelative && !rel.startsWith(`..${this.#sep}`) ?
+          `.${this.#sep}`
         : ''
-      this.matchEmit(!rel ? '.' + mark : pre + rel + mark)
+      this.matchEmit(!rel ? `.${mark}` : pre + rel + mark)
     }
   }
 
@@ -257,7 +267,7 @@ export abstract class GlobUtil<O extends GlobWalkerOpts = GlobWalkerOpts> {
     if (p) this.matchFinish(p, absolute)
   }
 
-  walkCB(target: Path, patterns: Pattern[], cb: () => any) {
+  walkCB(target: Path, patterns: Pattern[], cb: () => unknown) {
     /* c8 ignore start */
     if (this.signal?.aborted) cb()
     /* c8 ignore stop */
@@ -268,7 +278,7 @@ export abstract class GlobUtil<O extends GlobWalkerOpts = GlobWalkerOpts> {
     target: Path,
     patterns: Pattern[],
     processor: Processor,
-    cb: () => any,
+    cb: () => unknown,
   ) {
     if (this.#childrenIgnored(target)) return cb()
     if (this.signal?.aborted) cb()
@@ -289,7 +299,7 @@ export abstract class GlobUtil<O extends GlobWalkerOpts = GlobWalkerOpts> {
     for (const [m, absolute, ifDir] of processor.matches.entries()) {
       if (this.#ignored(m)) continue
       tasks++
-      this.match(m, absolute, ifDir).then(() => next())
+      void this.match(m, absolute, ifDir).then(() => next())
     }
 
     for (const t of processor.subwalkTargets()) {
@@ -314,30 +324,30 @@ export abstract class GlobUtil<O extends GlobWalkerOpts = GlobWalkerOpts> {
   walkCB3(
     target: Path,
     entries: Path[],
-    processor: Processor,
-    cb: () => any,
+    processorx: Processor,
+    cb: () => unknown,
   ) {
-    processor = processor.filterEntries(target, entries)
+    const proc = processorx.filterEntries(target, entries)
 
     let tasks = 1
     const next = () => {
       if (--tasks === 0) cb()
     }
 
-    for (const [m, absolute, ifDir] of processor.matches.entries()) {
+    for (const [m, absolute, ifDir] of proc.matches.entries()) {
       if (this.#ignored(m)) continue
       tasks++
-      this.match(m, absolute, ifDir).then(() => next())
+      void this.match(m, absolute, ifDir).then(() => next())
     }
-    for (const [target, patterns] of processor.subwalks.entries()) {
+    for (const [target, patterns] of proc.subwalks.entries()) {
       tasks++
-      this.walkCB2(target, patterns, processor.child(), next)
+      this.walkCB2(target, patterns, proc.child(), next)
     }
 
     next()
   }
 
-  walkCBSync(target: Path, patterns: Pattern[], cb: () => any) {
+  walkCBSync(target: Path, patterns: Pattern[], cb: () => unknown) {
     /* c8 ignore start */
     if (this.signal?.aborted) cb()
     /* c8 ignore stop */
@@ -348,7 +358,7 @@ export abstract class GlobUtil<O extends GlobWalkerOpts = GlobWalkerOpts> {
     target: Path,
     patterns: Pattern[],
     processor: Processor,
-    cb: () => any,
+    cb: () => unknown,
   ) {
     if (this.#childrenIgnored(target)) return cb()
     if (this.signal?.aborted) cb()
@@ -389,22 +399,22 @@ export abstract class GlobUtil<O extends GlobWalkerOpts = GlobWalkerOpts> {
     target: Path,
     entries: Path[],
     processor: Processor,
-    cb: () => any,
+    cb: () => unknown,
   ) {
-    processor = processor.filterEntries(target, entries)
+    const proc = processor.filterEntries(target, entries)
 
     let tasks = 1
     const next = () => {
       if (--tasks === 0) cb()
     }
 
-    for (const [m, absolute, ifDir] of processor.matches.entries()) {
+    for (const [m, absolute, ifDir] of proc.matches.entries()) {
       if (this.#ignored(m)) continue
       this.matchSync(m, absolute, ifDir)
     }
-    for (const [target, patterns] of processor.subwalks.entries()) {
+    for (const [target, patterns] of proc.subwalks.entries()) {
       tasks++
-      this.walkCB2Sync(target, patterns, processor.child(), next)
+      this.walkCB2Sync(target, patterns, proc.child(), next)
     }
 
     next()
@@ -477,7 +487,7 @@ export class GlobStream<
   stream(): MatchStream<O> {
     const target = this.path
     if (target.isUnknown()) {
-      target.lstat().then(() => {
+      void target.lstat().then(() => {
         this.walkCB(target, this.patterns, () => this.results.end())
       })
     } else {

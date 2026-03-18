@@ -1,6 +1,7 @@
 import { GLOBSTAR } from 'minimatch'
 import t from 'tap'
-import { MMPattern, Pattern } from '../dist/esm/pattern.js'
+import type { MMPattern } from '../dist/esm/pattern.js'
+import { Pattern } from '../dist/esm/pattern.js'
 import { Glob } from '../dist/esm/index.js'
 import { inspect } from 'node:util'
 

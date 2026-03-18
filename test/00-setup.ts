@@ -9,7 +9,6 @@ import t from 'tap'
 import { fileURLToPath } from 'url'
 
 const { writeFile, symlink } = promises
-//@ts-ignore
 t.pipe(createWriteStream('00-setup.tap'))
 process.env.TAP_BAIL = '1'
 
@@ -51,9 +50,9 @@ if (process.platform !== 'win32') {
 }
 
 ;['foo', 'bar', 'baz', 'asdf', 'quux', 'qwer', 'rewq'].forEach(
-  function (w) {
-    w = '/tmp/glob-test/' + w
-    t.test('create ' + w, async t => {
+  function (s) {
+    const w = `/tmp/glob-test/${s}`
+    t.test(`create ${w}`, async t => {
       await mkdirp(w)
       t.pass(w)
     })
@@ -110,7 +109,7 @@ if (process.platform === 'win32' || !process.env.TEST_REGEN) {
   const bashOutput: { [k: string]: string[] } = {}
 
   for (const pattern of globs) {
-    t.test('generate fixture ' + pattern, t => {
+    t.test(`generate fixture ${pattern}`, t => {
       const opts = [
         '-O',
         'globstar',
@@ -119,7 +118,7 @@ if (process.platform === 'win32' || !process.env.TEST_REGEN) {
         '-O',
         'nullglob',
         '-c',
-        'for i in ' + pattern + '; do echo $i; done',
+        `for i in ${pattern}; do echo $i; done`,
       ]
       const cp = spawn('bash', opts, { cwd: fixtureDir })
       const out: Buffer[] = []
@@ -143,9 +142,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   console.log('TAP version 14\\n1..1\\nok\\n')
 }
 
-export const bashResults:{ [path: string]: string[] } = ${
-      JSON.stringify(bashOutput, null, 2) + '\n'
-    }
+export const bashResults:{ [path: string]: string[] } = ${JSON.stringify(
+      bashOutput,
+      null,
+      2,
+    )}
 `
     await writeFile(fname, data)
   })
